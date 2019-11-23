@@ -30,7 +30,7 @@ def plot_episode_lengths(episode_lengths, epsilons, save=None):
     if save:
         clear_output(wait=True)
 
-    fig, ax1 = plt.subplots()
+    fig, ax1 = plt.subplots(figsize=(10,5))
 
     color = 'tab:blue'
     ax1.set_xlabel('Episode')
@@ -54,9 +54,14 @@ def plot_episode_lengths(episode_lengths, epsilons, save=None):
     fig.tight_layout() # Otherwise the right y-label is slightly clipped
     plt.title("Episode Length over Time")
 
-    plt.show()
     if save:
         plt.savefig(save)
+    plt.show()
+
+def test_episode_lengths():
+    episode_lengths = [9, 19, 17, 24, 32, 54, 76, 12, 92]
+    epsilons = [0.99 ** i for i in range(len(episode_lengths))]
+    plot_episode_lengths(episode_lengths, epsilons)
 
 def moving_average(data, window_width=10):
     # https://stackoverflow.com/questions/11352047/finding-moving-average-from-data-points-in-python
