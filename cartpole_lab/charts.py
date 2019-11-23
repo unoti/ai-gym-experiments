@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import numpy as np
 
 def histogram(seq, bins=10, title='Histogram'):
     plt.hist(seq, edgecolor = 'black', bins = bins)
@@ -16,23 +17,44 @@ def plot_fn(f, start, end, point_count = 100):
     plt.show()
 
 def plot_episode_lengths(episode_lengths, epsilons):
-    # Plot the episode length over time
+    """Plot the episode lengths over time.
+    Example:
+        episode_lengths = [9, 19, 17, 24, 32, 54, 76, 12, 92]
+        epsilons = [0.99 ** i for i in range(len(episode_lengths))]
+        plot_episode_lengths(episode_lengths, epsilons)
+    """
+    # 
     # https://matplotlib.org/gallery/api/two_scales.html
     fig, ax1 = plt.subplots()
 
     color = 'tab:blue'
-    ax1.set_xlabel('episode')
-    ax1.set_ylabel('steps', color=color)
+    ax1.set_xlabel('Episode')
+    ax1.set_ylabel('Steps', color=color)
     ax1.plot(episode_lengths, color=color)
     ax1.tick_params(axis='y', labelcolor=color)
-    
-    ax2 = ax1.twinx() # Instantiate a second set of axes that share the same x axis
+
+    avg_width = int(len(episode_lengths)/4)
+    ax1.plot(moving_average(episode_lengths, window_width=avg_width), color='tab:green', linestyle='--')
+    handles, labels = ax1.get_legend_handles_labels()
 
     color = 'tab:orange'
-    ax2.set_ylabel('epsilon', color=color)
-    ax2.plot(epsilons, color=color)
+    ax2 = ax1.twinx() # Instantiate a second set of axes that share the same x axis
+    ax2.set_label('Epsilon')
+    ax2.set_ylabel('Epsilon', color=color)
+    ax2.plot(epsilons, linestyle='dotted', alpha=0.5, color=color)
+    ax2.locator_params(nbins=8)
+    ax2.set_ylim([0, 1])
     ax2.tick_params(axis='y', labelcolor=color)
 
     fig.tight_layout() # Otherwise the right y-label is slightly clipped
     plt.title("Episode Length over Time")
+
     plt.show()
+
+def moving_average(data, window_width=10):
+    # https://stackoverflow.com/questions/11352047/finding-moving-average-from-data-points-in-python
+    # Maybe we'd be better off using an exponentially weighted moving average. But here's this.
+    w = window_width
+    cumulative = np.cumsum(np.insert(data, 0, 0))
+    avg_vec = (cumulative[w:] - cumulative[:-w]) / w
+    return avg_vec
