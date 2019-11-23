@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
+from IPython.display import clear_output
 
 def histogram(seq, bins=10, title='Histogram'):
     plt.hist(seq, edgecolor = 'black', bins = bins)
@@ -16,8 +17,9 @@ def plot_fn(f, start, end, point_count = 100):
     plt.plot(x, y)
     plt.show()
 
-def plot_episode_lengths(episode_lengths, epsilons):
+def plot_episode_lengths(episode_lengths, epsilons, save=None):
     """Plot the episode lengths over time.
+    save: Filename to save plot such as 'image.png'
     Example:
         episode_lengths = [9, 19, 17, 24, 32, 54, 76, 12, 92]
         epsilons = [0.99 ** i for i in range(len(episode_lengths))]
@@ -25,6 +27,9 @@ def plot_episode_lengths(episode_lengths, epsilons):
     """
     # 
     # https://matplotlib.org/gallery/api/two_scales.html
+    if save:
+        clear_output(wait=True)
+
     fig, ax1 = plt.subplots()
 
     color = 'tab:blue'
@@ -34,7 +39,7 @@ def plot_episode_lengths(episode_lengths, epsilons):
     ax1.tick_params(axis='y', labelcolor=color)
 
     avg_width = int(len(episode_lengths)/4)
-    ax1.plot(moving_average(episode_lengths, window_width=avg_width), color='tab:green', linestyle='--')
+    ax1.plot(moving_average(episode_lengths, window_width=avg_width), color='black', linestyle='--')
     handles, labels = ax1.get_legend_handles_labels()
 
     color = 'tab:orange'
@@ -50,6 +55,8 @@ def plot_episode_lengths(episode_lengths, epsilons):
     plt.title("Episode Length over Time")
 
     plt.show()
+    if save:
+        plt.savefig(save)
 
 def moving_average(data, window_width=10):
     # https://stackoverflow.com/questions/11352047/finding-moving-average-from-data-points-in-python
