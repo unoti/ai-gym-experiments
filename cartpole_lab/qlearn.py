@@ -7,7 +7,7 @@ from .agent import Agent
 
 class QLearningPolicy:            
     def __init__(self, env, learning_rate=0.001, epsilon_start=1, epsilon_min=0.01, epsilon_decay=0.995,
-                 gamma=0.95, memory_size=10000, batch_size=40):
+                 gamma=0.999, memory_size=10000, batch_size=40):
         """epsilon: probability of exploring by selecting a random action
         gamma: Discount factor for future rewards. Between 0 - 1.
         learning_rate: learning rate for the approximator

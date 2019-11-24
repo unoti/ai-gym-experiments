@@ -39,20 +39,28 @@ class QLearningPolicy:
         
         # Save this activity for experience replay.
         self.snapshots.append((prev_state, prev_action, reward, state, done))
+
+        # Learn about this action now.
+        # This makes things totally worse. Why? See notes 11/24/19, "After Each Step Update"
+        #self._learn_step(prev_state, prev_action, reward, state, done)
         
         if len(self.snapshots) >= self.batch_size:
             # Replay a batch of experiences.  This shuffles them so we don't train on a bunch of similar
             # states all at once (temporal separation).
             steps = random.sample(self.snapshots, self.batch_size)
             for (prev_state, prev_action, reward, state, done) in steps:
-                rewards_all = self.model.predict(prev_state)
-                if done:
-                    future_rewards = -1
-                else:
-                    future_rewards = np.max(self.model.predict(state))
-                target_reward = reward + self.gamma * future_rewards
-                rewards_all[prev_action] = target_reward
-                self.model.train(prev_state, rewards_all)
+                self._learn_step(prev_state, prev_action, reward, state, done)
+    
+    def _learn_step(self, prev_state, prev_action, reward, state, done):
+        rewards_all = self.model.predict(prev_state)
+        if done:
+            future_rewards = 0
+        else:
+            future_rewards = np.max(self.model.predict(state))
+        target_reward = reward + self.gamma * future_rewards
+        rewards_all[prev_action] = target_reward
+        self.model.train(prev_state, rewards_all)
+
     
     def episode_completed(self, episode):
         pass

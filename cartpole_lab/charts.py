@@ -35,12 +35,16 @@ def plot_episode_lengths(episode_lengths, epsilons, save=None):
     color = 'tab:blue'
     ax1.set_xlabel('Episode')
     ax1.set_ylabel('Steps', color=color)
-    ax1.plot(episode_lengths, 'o', color=color)
+    if len(episode_lengths) > 1000: # https://matplotlib.org/api/markers_api.html
+        dotstyle = ',' # pixels
+    else:
+        dotstyle = '.' # points
+    ax1.plot(episode_lengths, dotstyle, color=color)
     ax1.tick_params(axis='y', labelcolor=color)
 
     avg_width = int(len(episode_lengths)/4)
     ax1.plot(moving_average(episode_lengths, window_width=avg_width), color='black', linestyle='--')
-    handles, labels = ax1.get_legend_handles_labels()
+    #handles, labels = ax1.get_legend_handles_labels()
 
     color = 'tab:orange'
     ax2 = ax1.twinx() # Instantiate a second set of axes that share the same x axis
