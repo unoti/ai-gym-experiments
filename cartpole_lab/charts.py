@@ -35,7 +35,7 @@ def plot_episode_lengths(episode_lengths, epsilons, save=None):
     color = 'tab:blue'
     ax1.set_xlabel('Episode')
     ax1.set_ylabel('Steps', color=color)
-    ax1.plot(episode_lengths, color=color)
+    ax1.plot(episode_lengths, 'o', color=color)
     ax1.tick_params(axis='y', labelcolor=color)
 
     avg_width = int(len(episode_lengths)/4)

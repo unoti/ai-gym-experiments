@@ -1,6 +1,7 @@
 from .progress import log_progress
 from .charts import plot_episode_lengths
 import numpy as np
+import time
 
 class Agent:
     def __init__(self, env, policy):
@@ -27,7 +28,8 @@ class Agent:
     def train(self, episodes=100, render=False, epsilon_start=1.0, epsilon_min = 0.01, epsilon_decay=0.995):
         episode_lengths = []
         epsilons = []
-        save_image_every = 20
+        image_update_seconds = 5
+        last_update_time = time.time()
         
         epsilon_orig = self.policy.epsilon # Save the original epsilon, in case we want to do external things with agent later.
         self.policy.epsilon = epsilon_start
@@ -38,9 +40,11 @@ class Agent:
             episode_lengths.append(len(episode))
             epsilons.append(self.policy.epsilon)
             self.policy.episode_completed(episode)
-            if i>0 and i % save_image_every == 0:
-                print('saving')
+            now = time.time()
+            #print(now, now-last_update_time)
+            if now - last_update_time > image_update_seconds:
                 plot_episode_lengths(episode_lengths, epsilons, save=chartfile)
+                last_update_time = now
             
         plot_episode_lengths(episode_lengths, epsilons, save=chartfile)
         print('Max length=%f avg=%f' % (np.max(episode_lengths), np.mean(episode_lengths)))
