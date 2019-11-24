@@ -1,4 +1,4 @@
-from keras.models import Sequential
+from keras.models import Sequential, load_model
 from keras.layers import Dense # Dropout, BatchNormalization
 from keras.optimizers import Adam
 import numpy as np
@@ -44,3 +44,10 @@ class Approximator:
         batch_X = np.array([X])
         batch_Y = np.array([Y])
         self.train_multi(batch_X, batch_Y, batch_size=1)
+
+    def save(self, h5_filename):
+        # https://machinelearningmastery.com/save-load-keras-deep-learning-models/
+        self.model.save(h5_filename)
+    
+    def load(self, h5_filename):
+        self.model = load_model(h5_filename)

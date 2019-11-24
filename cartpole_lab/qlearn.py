@@ -59,7 +59,14 @@ class QLearningPolicy:
         q_t1 = np.max(q_t1_all) # Expected rewards for taking the best action in t+1
 
         # SARSA update function Sutton and Barto formula 6.7 p. 130
-        prev_q = prev_q + self.learning_rate * (reward + self.gamma * q_t1 - prev_q)
+        if done:
+            future_rewards = 0
+        else:
+            future_rewards = self.gamma * q_t1
+        target_prev_step = reward + future_rewards # Target expected rewards for prev_step
+        delta_prev_step = target_prev_step - prev_q # Difference between target and what we have now
+        prev_q = prev_q + self.learning_rate * delta_prev_step # Adjust current q value based on learning rate
+        # was: prev_q = prev_q + self.learning_rate * (reward + self.gamma * q_t1 - prev_q)
         prev_q_all[prev_action] = prev_q
     
     def _experience_replay(self):
