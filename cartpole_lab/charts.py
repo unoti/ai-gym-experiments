@@ -84,7 +84,7 @@ def moving_average(data, window_width=10):
     w = window_width
     weight_new = 1/w
     weight_old = 1 - weight_new
-    running = np.mean(data[:window_width])
+    running = np.mean(data[0:4])
     averages = []
     for item in data:
         running = running * weight_old + item * weight_new
