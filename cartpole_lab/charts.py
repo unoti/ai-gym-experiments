@@ -43,7 +43,9 @@ def plot_episode_scores(episode_scores, epsilons, save=None):
     ax1.tick_params(axis='y', labelcolor=color)
 
     window_width = 100 # Scoring criteria for most environments is average over 100 consecutive episodes.
-    ax1.plot(moving_average(episode_scores, window_width=window_width), color='black', linestyle='--')
+    print('avg of last %d episodes: %f' % (window_width, last_average(episode_scores, window_width)))
+    averages = moving_average(episode_scores, window_width=window_width)
+    ax1.plot(averages, color='black', linestyle='--')
     #handles, labels = ax1.get_legend_handles_labels()
 
     color = 'tab:orange'
@@ -67,10 +69,31 @@ def test_episode_scores():
     epsilons = [0.99 ** i for i in range(len(episode_scores))]
     plot_episode_scores(episode_scores, epsilons)
 
-def moving_average(data, window_width=10):
+def moving_average_old(data, window_width=10):
     # https://stackoverflow.com/questions/11352047/finding-moving-average-from-data-points-in-python
     # Maybe we'd be better off using an exponentially weighted moving average. But here's this.
     w = window_width
+    w = min(len(data), w)
     cumulative = np.cumsum(np.insert(data, 0, 0))
     avg_vec = (cumulative[w:] - cumulative[:-w]) / w
     return avg_vec
+
+def moving_average(data, window_width=10):
+    if len(data) == 0:
+        return []
+    w = window_width
+    weight_new = 1/w
+    weight_old = 1 - weight_new
+    running = np.mean(data[:window_width])
+    averages = []
+    for item in data:
+        running = running * weight_old + item * weight_new
+        averages.append(running)
+    return averages
+
+def last_average(data, last_count):
+    if len(data) < last_count:
+        return np.mean(data)
+    else:
+        return np.mean(data[:-last_count])
+        
