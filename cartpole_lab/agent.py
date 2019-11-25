@@ -1,5 +1,5 @@
 from .progress import log_progress
-from .charts import plot_episode_lengths
+from .charts import plot_episode_scores
 import numpy as np
 import time
 
@@ -26,7 +26,7 @@ class Agent:
         return episode
     
     def train(self, episodes=100, render=False, epsilon_start=1.0, epsilon_min = 0.01, epsilon_decay=0.995):
-        episode_lengths = []
+        episode_scores = []
         epsilons = []
         image_update_seconds = 5
         last_update_time = time.time()
@@ -37,15 +37,17 @@ class Agent:
         chartfile = r'images/progress.png'
         for _ in log_progress(range(episodes), name='Episodes'):
             episode = self.run_episode(render=render)
-            episode_lengths.append(len(episode))
+            episode_scores.append(total_rewards(episode))
             epsilons.append(self.policy.epsilon)
             self.policy.episode_completed(episode)
             now = time.time()
             if now - last_update_time > image_update_seconds:
-                plot_episode_lengths(episode_lengths, epsilons, save=chartfile)
+                plot_episode_scores(episode_scores, epsilons, save=chartfile)
                 last_update_time = now
 
-        plot_episode_lengths(episode_lengths, epsilons, save=chartfile)
-        print('Max length=%f avg=%f' % (np.max(episode_lengths), np.mean(episode_lengths)))
+        plot_episode_scores(episode_scores, epsilons, save=chartfile)
         
         self.policy.epsilon = epsilon_orig # Restore epsilon.
+
+def total_rewards(episode):
+    return sum([reward for (state, action, reward, next_state, done) in episode])
