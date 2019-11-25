@@ -2,10 +2,10 @@ from collections import deque
 import random
 import numpy as np
 
-from .agent import Agent
-from .approximator import Approximator
+from cartpole_lab.agent import Agent
+from cartpole_lab.approximator import Approximator
 
-class QLearningPolicy:            
+class DeepQLanderPolicy:            
     def __init__(self, env, learning_rate=0.001, epsilon_start=1, epsilon_min=0.01, epsilon_decay=0.995,
                  gamma=0.95, snapshots=1000000, batch_size=20):
         """epsilon: probability of exploring by selecting a random action
