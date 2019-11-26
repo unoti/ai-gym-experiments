@@ -76,6 +76,9 @@ class QLearningPolicy:
         if not state:
             state = self.env.reset()
         return self.model.predict(state)
+    
+    def load(self, filename=r'models/cartpole-deep-q1.h5'):
+        self.model.load(filename)
 
 def deep_rico(env):
     return Agent(env, QLearningPolicy(env))

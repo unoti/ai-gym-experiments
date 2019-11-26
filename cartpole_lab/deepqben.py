@@ -30,6 +30,7 @@ class DeepQBenPolicy:
 
         # Set openAI gym space
         self.action_space = env.action_space.n
+        self.observation_space = env.observation_space.shape[0]
         
         # Memory managment for RL
         self.memory = deque(maxlen=MEMORY_SIZE)
@@ -64,8 +65,8 @@ class DeepQBenPolicy:
     def _adapt_state(self, state):
         # Transform a state into a single-row array of states.
         # Ben's code handles all states as single-rowed batches like this.
-        # Ben does np.reshape(state, [1, env.observation_space.shape[0]]) but this is the same.
-        return np.expand_dims(state, axis=0)
+        # this is the same as np.expand_dims(state, axis=0)
+        return np.reshape(state, [1, self.observation_space])
 
     def step_completed(self, prev_state, prev_action, reward, state, terminal):
         prev_state = self._adapt_state(prev_state)

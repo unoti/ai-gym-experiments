@@ -48,6 +48,15 @@ class Agent:
         plot_episode_scores(episode_scores, epsilons, save=chartfile)
         
         self.policy.epsilon = epsilon_orig # Restore epsilon.
+    
+    def demo(self, episodes=10, render=True):
+        scores = []
+        for _ in range(episodes):
+            episode = self.run_episode(render=render)
+            rewards = total_rewards(episode)
+            scores.append(rewards)
+            print('score=',rewards)
+        print('Avg rewards=',np.mean(scores))
 
 def total_rewards(episode):
     return sum([reward for (state, action, reward, next_state, done) in episode])
