@@ -38,8 +38,10 @@ class QLearningPolicy:
         self.epsilon = max(self.epsilon_min, self.epsilon * self.epsilon_decay)
 
         # Terminating is bad. Help give it an anchor in sadness.
-        if done:
-            reward = -reward
+        # Actually, the correct way to do this is to tell it that *future* rewards will be zero
+        # which we'll do below.  This line messes up environments that give big final rewards/penalties.
+        #if done:
+        #    reward = -reward
         
         # Save this activity for experience replay.
         self.snapshots.append((prev_state, prev_action, reward, state, done))
