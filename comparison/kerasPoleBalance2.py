@@ -1,3 +1,6 @@
+# From https://github.com/Ben-C-Harris/Reinforcement-Learning-Pole-Balance
+# A variation on this code to compare to my solution
+
 import random
 import gym
 import numpy as np
@@ -135,11 +138,10 @@ class Agent:
         action = None
         while True:
             prev_state = state
-            prev_action = action
             action = self.policy.suggest_action(state)
             state, reward, done, _ = self.env.step(action)
-            episode.append((prev_state, prev_action, reward, state, done))
-            self.policy.step_completed(prev_state, prev_action, reward, state, done)
+            episode.append((prev_state, action, reward, state, done))
+            self.policy.step_completed(prev_state, action, reward, state, done)
             if render:
                 self.env.render()
             if done:
@@ -199,61 +201,18 @@ def poleBalance2():
         #state = np.reshape(state, [1, observation_space]) # random new state for this run instance
         step = 0 # init starting simulation step at zero
         while True: # Each timestep within said simulation...
-            if DEBUG:
-                print("Starting New Time Step...")
             step += 1 # New timestep
             #env.render() # Render image of current gym simulation
             
-            # Call object method act which delivers a 0 or 1 based upon exploration rate/decay (1 == Right & 0 == Left)
-            #action = dqnObj.act(state) # state will be a first iteration new state, or will be the last time steps state
             action = dqnObj.suggest_action(state) # state will be a first iteration new state, or will be the last time steps state
-            if DEBUG:
-                if action == 0:
-                    print("Cart push Left...")
-                elif action == 1:
-                    print("Cart push Right...")
-            
-            '''
-            time step forward using random action but as exploration decays use 0 less and 1 more.
-            .step creates an Observation(state_next = object), reward(float), terminal(done = bool), info(dict) for each time step
-            state_next is essentially what is going on in the gym, rotations velocities etc.
-            '''
-            # Using action against the current state what has happened - step forward to find out...          
             state_next, reward, terminal, info = env.step(action) 
-           
-            # If the simulation has not terminated (i.e. failed criteria) then it gets a positive reward.
-            # If it has terminated, i.e. the pole has fallen over/fail criteria met then it gets a negative reward
-            reward = reward if not terminal else -reward
-                        
-            state = np.reshape(state, [1, observation_space]) # random new state for this run instance
-            state_next = np.reshape(state_next, [1, observation_space])
-            
-            # Activly rememeber what state you were in, what action you took, 
-            # whether that was "rewarding" and what the next state was and then whether it terminated or not.
-            dqnObj.remember(state, action, reward, state_next, terminal)
-            
+            dqnObj.step_completed(state, action, reward, state_next, terminal)
             state = state_next # Define state as that of your prior attempt - i.e. previous step influences this step i.e. learninggggggg
             
-            #frames.append(Image.fromarray(env.render(mode='rgb_array')))  # save each frames
-
             if terminal:
                 print ("Run: " + str(run) + ", exploration: " + str(dqnObj.exploration_rate) + ", score: " + str(step))
                 dqnObj.addScore(step, run) # Call inherited method              
-                if run % 5 == 0: # Export every 5th run                       
-                    if EXPORT_MODEL:
-                        if DEBUG:
-                            print("Exporting Model")
-                        dqnObj.exportModel()
-                    if run % 20 == 0: # Export GIF of latest 5 runs every 20 runs
-                        gifPath = "./GIFs/cart_R" + str(run) + ".gif"
-                        if DEBUG:
-                            print("Creating GIF: " + gifPath)  
-                        if SAVE_GIFS:
-                            dqnObj.exportGIF(gifPath, frames)      
-                    frames = [] # Reset
-
                 break            
-            dqnObj.experienceReplay() # Actual reinforcement...
 
 def test_agent():
     env = gym.make(ENV_NAME) # New OpenAI Gym Env

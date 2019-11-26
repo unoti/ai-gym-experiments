@@ -13,12 +13,11 @@ class Agent:
         state = self.env.reset()
         action = None
         while True:
-            prev_state = state
-            prev_action = action
             action = self.policy.suggest_action(state)
-            state, reward, done, _ = self.env.step(action)
-            episode.append((prev_state, prev_action, reward, state, done))
-            self.policy.step_completed(prev_state, prev_action, reward, state, done)
+            state_next, reward, done, _ = self.env.step(action)
+            episode.append((state, action, reward, state_next, done))
+            self.policy.step_completed(state, action, reward, state_next, done)
+            state = state_next
             if render:
                 self.env.render()
             if done:
