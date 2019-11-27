@@ -15,6 +15,7 @@ class ProbabilityBag:
         self.max_size = max_size # Maximum number of entries in the bag.
         self.weights = np.array([])
         self.items = []
+        self.nonzero_epsilon = 0.0001 # Make all probabilities non-zero.
     
     def insert_batch(self, weighted_items):
         """Insert a group of items.  The priority of each item is the first member of the tuple.
@@ -34,7 +35,7 @@ class ProbabilityBag:
 
         for weight, item in weighted_items:
             self.total_weights += weight
-            self.weights = np.append(self.weights, weight)
+            self.weights = np.append(self.weights, weight + self.nonzero_epsilon)
             self.items.append(item)
 
     def remove_batch(self, desired_count):
