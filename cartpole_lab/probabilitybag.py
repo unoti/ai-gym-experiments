@@ -8,6 +8,7 @@ class ProbabilityBag:
      * The rows inserted into the bag indexable things (tuples, lists, or numpy arrays)
      * The probability that a given item will be drawn from a bag depends that item's weight.
      * The weight of each item is given when it's inserted into the bag.
+     * When the bag gets full we remove oldest items to make room.
     """
     def __init__(self, max_size):
         self.total_weights = 0 # For calculating probability per item. We'll maintain this as we add and remove items.
@@ -24,6 +25,13 @@ class ProbabilityBag:
             items = [(7, 'seven'), (9, 'nine')]
             probability_bag.push_batch(items)
         """
+        # Make room for new items if necessary.
+        if not hasattr(weighted_items, '__len__'):
+            weighted_items = list(weighted_items) # So we can check length.
+        overage = len(self.items) + len(weighted_items) - self.max_size
+        if overage > 0:
+            self._delete_first_items(overage)
+
         for weight, item in weighted_items:
             self.total_weights += weight
             self.weights = np.append(self.weights, weight)
@@ -54,6 +62,11 @@ class ProbabilityBag:
             batch.append(item)
         
         return batch
+
+    def _delete_first_items(self, n):
+        self.total_weights -= np.sum(self.weights[:n])
+        self.weights = np.delete(self.weights, np.s_[:n]) # Delete first n items from the front.
+        self.items = self.items[n:] # Delete first n items.
 
     def _pop(self, index):
         weight = self.weights[index]

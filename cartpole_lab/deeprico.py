@@ -34,8 +34,7 @@ class QLearningPolicy:
         return action
 
     def step_completed(self, prev_state, prev_action, reward, state, done):
-        # Decay epsilon
-        self.epsilon = max(self.epsilon_min, self.epsilon * self.epsilon_decay)
+        self._decay_epsilon()
 
         # Terminating is bad. Help give it an anchor in sadness.
         # Actually, the correct way to do this is to tell it that *future* rewards will be zero
@@ -56,7 +55,10 @@ class QLearningPolicy:
             steps = random.sample(self.snapshots, self.batch_size)
             for (prev_state, prev_action, reward, state, done) in steps:
                 self._learn_step(prev_state, prev_action, reward, state, done)
-    
+
+    def _decay_epsilon(self):
+        self.epsilon = max(self.epsilon_min, self.epsilon * self.epsilon_decay)
+
     def _learn_step(self, prev_state, prev_action, reward, state, done):
         rewards_all = self.model.predict(prev_state)
         if done:

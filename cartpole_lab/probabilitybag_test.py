@@ -1,4 +1,6 @@
-from probabilitybag import ProbabilityBag
+# Run tests with ```py.test``` or ```python probabilitybag_test.py```
+
+from .probabilitybag import ProbabilityBag
 import unittest
 from collections import Counter
 
@@ -75,6 +77,19 @@ class TestProbabilityBag(unittest.TestCase):
         self.assertNotEqual(largest, smallest) # To make sure there's no funny stuff like all counts = 0
         self.assertNotEqual(largest, 0)
         self.assertNotEqual(smallest, 0)
+    
+    def test_make_room(self):
+        # Max size is 7, and there are 5 items in the bag.
+        self.assertEqual(7, self.gunslingers.max_size)
+        self.assertEqual(5, len(self.gunslingers))
+        batch = [(2, 'Lando'), (3, 'Han'), (2, 'Leah')]
+        self.gunslingers.insert_batch(batch)
+        self.assertEqual('Eddie,Odetta,Jake,Oy,Lando,Han,Leah', ','.join(self.gunslingers.items))
+        self.assertEqual(7, len(self.gunslingers))
+        #remaining_weights = 5.5 # Roland got pushed out. This is what's left of the original weights.
+        #new_weights = 7 # 2 + 3 + 2
+        final_expected = 12.5 # 5.5 + 7
+        self.assertEqual(final_expected, self.gunslingers.total_weights)
 
 if __name__ == '__main__':
     unittest.main()
