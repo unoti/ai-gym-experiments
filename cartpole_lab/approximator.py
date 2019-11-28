@@ -8,7 +8,6 @@ class Approximator:
     def __init__(self, num_inputs, num_outputs, learning_rate=0.01):
         self.model = Sequential()
         self.model.add(Dense(64, input_shape=(num_inputs,), activation='relu'))
-        #self.model.add(Dense(64, activation='relu'))
         self.model.add(Dense(64, activation='relu'))
         self.model.add(Dense(num_outputs, activation='linear'))
 
