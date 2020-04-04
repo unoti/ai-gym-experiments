@@ -5,10 +5,10 @@ class ProbabilityBag:
     A ProbabilityBag is a collection of items that can provide samples of items,
     where you can define the probability of drawing items from the bag.
     It has the following characteristics:
-     * The rows inserted into the bag indexable things (tuples, lists, or numpy arrays)
+     * The rows inserted into the bag area indexable things (tuples, lists, or numpy arrays)
      * The probability that a given item will be drawn from a bag depends that item's weight.
      * The weight of each item is given when it's inserted into the bag.
-     * When the bag gets full we remove oldest items to make room.
+     * When the bag gets full we remove the oldest items to make room.
     """
     def __init__(self, max_size):
         self.total_weights = 0 # For calculating probability per item. We'll maintain this as we add and remove items.
@@ -18,7 +18,8 @@ class ProbabilityBag:
         self.nonzero_epsilon = 0.0001 # Make all probabilities non-zero.
     
     def insert_batch(self, weighted_items):
-        """Insert a group of items.  The priority of each item is the first member of the tuple.
+        """
+        Insert a group of items.  The priority of each item is the first member of the tuple.
         weighted_items: a sequence like [(weight1, item1), (weight2, item2)...]
 
         Example:
@@ -39,7 +40,8 @@ class ProbabilityBag:
             self.items.append(item)
 
     def remove_batch(self, desired_count):
-        """Remove a randomly selected batch of n items from the bag.  The probability
+        """
+        Remove a randomly selected batch of n items from the bag.  The probability
         of an item being selected is proportional to its priority.
         """
         batch_count = min(desired_count, len(self.items))

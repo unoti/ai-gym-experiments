@@ -4,7 +4,20 @@ import numpy as np
 import time
 
 class Agent:
+    """
+    A reinforcement learning agent. Provides infrastructue to support
+    training.  The actual intelligence is injected into the agent via the policy.
+    """
     def __init__(self, env, policy):
+        """
+        @param env: The environment.
+        @param policy: The "brain" of the agent with the following methods and attributes:
+            step_completed(state, action, reward, state_next, done)
+                Called when we've completed one step.
+            epsilon: A number from 0-1 indicating the probability of taking a random action.
+            episode_completed(episode):
+                Called when we have completed training one episode.
+        """
         self.env = env
         self.policy = policy
     
