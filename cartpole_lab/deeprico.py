@@ -18,8 +18,16 @@ class QLearningPolicy:
         self.epsilon_decay = epsilon_decay
         self.gamma = gamma # Discount factor for future rewards.
         self.snapshots = deque(maxlen=snapshots) # [(prev_state, prev_action, reward, next_state, done)]
-        num_inputs = self.env.observation_space.shape[0] # 4
-        num_outputs = self.env.action_space.n # 2
+        # Flatten the observation to 1d. This is needed if the observation is
+        # multi-dimensional as it is for car racing, which is 96 x 96 x 3 (96x96 pixels with 3 color layers).
+        num_inputs = np.prod(self.env.action_space.shape) # if shape is [2,3] this yields 2*3=6.
+        #num_inputs = self.env.observation_space.shape[0] # 4
+        if hasattr(self.env.action_space, 'n'):
+            # For discrete outputs, where you choose among several choices e.g. ['LEFT','RIGHT','FORWARD'].
+            num_outputs = self.env.action_space.n # 2
+        else:
+            # For continuous outputs, e.g. 3 floats for Steering, Acceleration, Brake.
+            num_outputs = self.env.action_space.shape[0]
         self.model = Approximator(num_inputs, num_outputs, learning_rate)
         self.batch_size = batch_size
 
@@ -29,7 +37,8 @@ class QLearningPolicy:
         if np.random.uniform() <= epsilon:
             return self.env.action_space.sample()
 
-        rewards_all = self.model.predict(state) # Rewards for all possible actions
+        flattened_state = state.ravel() # Convert 96x96x3 into a 1d with 96x96x3 items.
+        rewards_all = self.model.predict(flattened_state) # Rewards for all possible actions
         action = np.argmax(rewards_all) # Index of the action having the highest rewards.
         return action
 
@@ -60,15 +69,17 @@ class QLearningPolicy:
         self.epsilon = max(self.epsilon_min, self.epsilon * self.epsilon_decay)
 
     def _learn_step(self, prev_state, prev_action, reward, state, done):
-        rewards_all = self.model.predict(prev_state)
+        rewards_all = self.model.predict(self._flatten(prev_state))
         if done:
             future_rewards = 0
         else:
-            future_rewards = np.max(self.model.predict(state))
+            future_rewards = np.max(self.model.predict(self._flatten(state)))
         target_reward = reward + self.gamma * future_rewards
         rewards_all[prev_action] = target_reward
         self.model.train(prev_state, rewards_all)
 
+    def _flatten(self, state):
+        return state.ravel() # Convert 96x96x3 into a 1d with 96x96x3 items.
     
     def episode_completed(self, episode):
         pass
