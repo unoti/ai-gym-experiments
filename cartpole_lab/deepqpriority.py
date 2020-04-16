@@ -7,7 +7,7 @@ RETURN_WEIGHT = 0.1 # Weight to return surprise memories back to experience pool
 
 class DeepQPrioritized(QLearningPolicy):
     def __init__(self, env, snapshots=100000, **kwargs):
-        super().__init__(env, snapshots=snapshots)
+        super().__init__(env, snapshots=snapshots, **kwargs)
         self.snapshots = None # We'll use the probability bag instead
         self.experience = ProbabilityBag(max_size=snapshots)
         self._expected_reward = 0 # Expected rewards from last action taken.
@@ -51,5 +51,5 @@ class DeepQPrioritized(QLearningPolicy):
             return_batch.append((RETURN_WEIGHT, item))
         self.experience.insert_batch(return_batch)
 
-def deep_priority(env):
-    return Agent(env, DeepQPrioritized(env))
+def deep_priority(env, **kwargs):
+    return Agent(env, DeepQPrioritized(env, **kwargs))
