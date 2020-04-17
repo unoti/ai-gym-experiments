@@ -62,13 +62,19 @@ class Agent:
         self.policy.epsilon = epsilon_orig # Restore epsilon.
     
     def demo(self, episodes=10, render=True):
+        """
+        Run some sessions without any random actions; always use the policy.
+        """
         scores = []
+        orig_epsilon = self.policy.epsilon
+        self.policy.epsilon = 0
         for _ in range(episodes):
             episode = self.run_episode(render=render)
             rewards = total_rewards(episode)
             scores.append(rewards)
             print('score=',rewards)
         print('Avg rewards=',np.mean(scores))
+        self.policy.epsilon = orig_epsilon
 
 def total_rewards(episode):
     return sum([reward for (state, action, reward, next_state, done) in episode])
